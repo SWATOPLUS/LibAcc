@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LibAcc.Client\LibAcc.Client.csproj" />
-    <ProjectReference Include="..\LibAcc.Shared\LibAcc.Shared.csproj" />
   </ItemGroup>
 
 </Project>
