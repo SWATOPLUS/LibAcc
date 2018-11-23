@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LibAcc.Abstractions\LibAcc.Abstractions.csproj" />
     <ProjectReference Include="..\LibAcc.Client\LibAcc.Client.csproj" />
   </ItemGroup>
 

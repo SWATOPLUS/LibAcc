@@ -1,4 +1,4 @@
-﻿namespace LibAcc.Abstractions
+﻿namespace LibAcc.Abstractions.Models
 {
     public static class BookAttributeTypes
     {

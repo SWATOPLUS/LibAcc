@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using System.Linq;
 using System.Net.Mime;
+using Microsoft.Extensions.Configuration;
+using LibAcc.EfRepositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibAcc.Server
 {
@@ -15,6 +18,14 @@ namespace LibAcc.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var configuration = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+            
+            var dbConnString = configuration.GetConnectionString("mainDbConnString");
+
+            services.AddDbContext<MainDbContext>(o => o.UseSqlServer(dbConnString));
+
             services.AddMvc();
 
             services.AddResponseCompression(options =>

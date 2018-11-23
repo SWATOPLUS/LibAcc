@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LibAcc.Abstractions
+namespace LibAcc.Abstractions.Models
 {
     public class Book
     {
@@ -15,6 +15,6 @@ namespace LibAcc.Abstractions
 
         public DateTime AccountDate { get; set; }
 
-        public ICollection<BookAttribute> Attributes { get; set; }
+        public List<BookAttribute> Attributes { get; set; }
     }
 }
