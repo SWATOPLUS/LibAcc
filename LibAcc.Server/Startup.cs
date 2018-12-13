@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Serialization;
 using System.Linq;
 using System.Net.Mime;
+using LibAcc.Abstractions.Models;
+using LibAcc.Abstractions.Services;
+using LibAcc.Server.Services;
 using Microsoft.Extensions.Configuration;
-using LibAcc.EfRepositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibAcc.Server
@@ -22,7 +23,7 @@ namespace LibAcc.Server
                 .AddEnvironmentVariables()
                 .Build();
             
-            var dbConnString = configuration.GetConnectionString("mainDbConnString");
+            var dbConnString = configuration.GetValue<string>("mainDbConnString");
 
             services.AddDbContext<MainDbContext>(o => o.UseSqlServer(dbConnString));
 
@@ -36,6 +37,8 @@ namespace LibAcc.Server
                     WasmMediaTypeNames.Application.Wasm,
                 });
             });
+
+            services.AddScoped<ICrudService<Book>>(context => new BookCrudService(context.GetService<MainDbContext>()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

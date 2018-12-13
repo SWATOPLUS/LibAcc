@@ -1,7 +1,7 @@
 ﻿using LibAcc.Abstractions.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibAcc.EfRepositories
+namespace LibAcc.Server
 {
     public class MainDbContext : DbContext
     {
@@ -12,6 +12,8 @@ namespace LibAcc.EfRepositories
 
         public DbSet<Book> Books { get; set; }
 
-        public DbSet<BookAttribute> BookAttributes { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+
+        public DbSet<RentOrder> RentOrders { get; set; }
     }
 }

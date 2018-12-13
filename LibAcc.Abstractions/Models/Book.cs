@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace LibAcc.Abstractions.Models
 {
@@ -9,12 +8,12 @@ namespace LibAcc.Abstractions.Models
 
         public string Title { get; set; }
 
+        public string Author { get; set; }
+
         public string Description { get; set; }
 
         public DateTime PrintDate { get; set; }
 
         public DateTime AccountDate { get; set; }
-
-        public List<BookAttribute> Attributes { get; set; }
     }
 }

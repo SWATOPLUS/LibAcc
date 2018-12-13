@@ -15,6 +15,7 @@ namespace LibAcc.Server.Migrations
                     BookId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Title = table.Column<string>(nullable: true),
+                    Author = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     PrintDate = table.Column<DateTime>(nullable: false),
                     AccountDate = table.Column<DateTime>(nullable: false)
@@ -25,40 +26,49 @@ namespace LibAcc.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookAttributes",
+                name: "Customers",
                 columns: table => new
                 {
-                    BookAttributeId = table.Column<int>(nullable: false)
+                    CustomerId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    BookId = table.Column<int>(nullable: false),
-                    Type = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true)
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
+                    AdditionalInfo = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookAttributes", x => x.BookAttributeId);
-                    table.ForeignKey(
-                        name: "FK_BookAttributes_Books_BookId",
-                        column: x => x.BookId,
-                        principalTable: "Books",
-                        principalColumn: "BookId",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_Customers", x => x.CustomerId);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_BookAttributes_BookId",
-                table: "BookAttributes",
-                column: "BookId");
+            migrationBuilder.CreateTable(
+                name: "RentOrders",
+                columns: table => new
+                {
+                    RentOrderId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CustomerId = table.Column<int>(nullable: false),
+                    BookId = table.Column<int>(nullable: false),
+                    OrderDays = table.Column<int>(nullable: false),
+                    OrderDate = table.Column<DateTime>(nullable: false),
+                    ReturnDate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RentOrders", x => x.RentOrderId);
+                });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BookAttributes");
+                name: "Books");
 
             migrationBuilder.DropTable(
-                name: "Books");
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "RentOrders");
         }
     }
 }
