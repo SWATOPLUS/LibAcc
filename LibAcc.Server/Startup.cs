@@ -39,6 +39,8 @@ namespace LibAcc.Server
             });
 
             services.AddScoped<ICrudService<Book>>(context => new BookCrudService(context.GetService<MainDbContext>()));
+            services.AddScoped<ICrudService<Customer>>(context => new CustomerCrudService(context.GetService<MainDbContext>()));
+            services.AddScoped<ICrudService<RentOrder>>(context => new RentOrderCrudService(context.GetService<MainDbContext>()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
