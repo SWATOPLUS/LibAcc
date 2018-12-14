@@ -1,15 +1,28 @@
-﻿<div class="alert alert-secondary mt-4" role="alert">
-    <span class="oi oi-pencil mr-2" aria-hidden="true"></span> 
-    <strong>@Title</strong>
+﻿@using LibAcc.Abstractions
+@inject HttpClient HttpClient
 
-    <span class="text-nowrap">
-        Please take our
-        <a target="_blank" class="font-weight-bold" href="https://go.microsoft.com/fwlink/?linkid=2041371">brief survey</a>
-    </span>
-    and tell us what you think.
-</div>
+<h2>Statistics</h2>
+<hr/>
 
+@if (Stats == null)
+{
+    <em>Loading...</em>
+}
+else
+{
+    <div>
+        <div>Total Books: @Stats.TotalBooks</div>
+        <div>Total Customers: @Stats.TotalCustomers</div>
+        <div>Total Late Rents: @Stats.TotalLateRents</div>
+    </div>
+}
 @functions {
-    [Parameter]
-    string Title { get; set; } // Demonstrates how a parent component can supply parameters
+
+    Stats Stats { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        Stats = await HttpClient.GetJsonAsync<Stats>("api/Stats");
+    }
+
 }
