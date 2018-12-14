@@ -5,23 +5,10 @@
 
 <h1>Books Register</h1>
 <hr />
-<table style="background:#05163D; color: honeydew;width: 100%">
-    <tr>
-        <td width="20">&nbsp;</td>
-        <td>
-            <h2>Add new book</h2>
-        </td>
-        <td>&nbsp;</td>
-        <td align="right">
-            <button class="btn btn-info" onclick="@Clear">Clear</button>
-        </td>
-        <td width="10">&nbsp;</td>
-    </tr>
-    <tr>
-        <td colspan="2"></td>
-    </tr>
-</table>
-<hr />
+<form>
+    <ColoredHeader BackGround="#05163D" Color="honeydew" Title="Add new book">
+        <button type="reset" class="btn btn-info" onclick="@Clear">Clear</button>
+    </ColoredHeader>
     <table class="form-group">
         <tr>
             <td>
@@ -70,23 +57,13 @@
             <td width="20">&nbsp;</td>
             <td></td>
             <td>
-                <button type="submit" class="btn btn-success" onclick="@(async () => await AddBook())" style="width:220px;">Save</button>
+                <button type="button" class="btn btn-success" onclick="@(async () => await AddBook())" style="width:220px;">Save</button>
             </td>
         </tr>
     </table>
+</form>
+<ColoredHeader BackGround="#0A2464" Color="honeydew" Title="Book list" />
 
-<table width="100%" style="background:#0A2464;color:honeydew">
-    <tr>
-        <td width="20">&nbsp;</td>
-        <td>
-            <h2>Book list</h2>
-        </td>
-
-    </tr>
-    <tr>
-        <td colspan="2"></td>
-    </tr>
-</table>
 
 @if (Books == null)
 {
@@ -125,37 +102,45 @@ else
 
 
 @functions {
-    Book[] Books { get; set; }
+Book[] Books { get; set; }
 
-    Book EditingBook { get; set; }
+Book EditingBook { get; set; }
 
-    protected override async Task OnInitAsync()
+protected override async Task OnInitAsync()
+{
+    Clear();
+    Books = await BookService.GetAll();
+}
+
+void Clear()
+{
+    EditingBook = new Book
     {
-        Clear();
-        Books = await BookService.GetAll();
-    }
+        AccountDate = DateTime.Now,
+        Author = string.Empty,
+        BookId = 0,
+        Description = string.Empty,
+        PrintDate = DateTime.MinValue,
+        Title = string.Empty
+    };
 
-    void Clear()
-    {
-        EditingBook = new Book {AccountDate = DateTime.Now};
+}
 
-    }
+async Task AddBook()
+{
+    await BookService.AddOrUpdate(EditingBook);
+    Clear();
+    Books = await BookService.GetAll();
+}
 
-    async Task AddBook()
-    {
-        await BookService.AddOrUpdate(EditingBook);
-        Clear();
-        Books = await BookService.GetAll();
-    }
+async Task EditStudent(int id)
+{
+    EditingBook = await BookService.Get(id);
+}
 
-    async Task EditStudent(int id)
-    {
-        EditingBook = await BookService.Get(id);
-    }
-
-    async Task DeleteStudent(int id)
-    {
-        await BookService.Delete(id);
-        Books = await BookService.GetAll();
-    }
+async Task DeleteStudent(int id)
+{
+    await BookService.Delete(id);
+    Books = await BookService.GetAll();
+}
 }

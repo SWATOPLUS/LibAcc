@@ -16,7 +16,15 @@ namespace LibAcc.Server.Services
 
         public async Task<Customer> AddOrUpdate(Customer entity)
         {
-            _dbContext.Add(entity);
+            if (entity.CustomerId == 0)
+            {
+                _dbContext.Add(entity);
+            }
+            else
+            {
+                _dbContext.Customers.Update(entity);
+            }
+
             await _dbContext.SaveChangesAsync();
 
             return entity;

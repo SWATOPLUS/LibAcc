@@ -1,0 +1,30 @@
+﻿<table style="background:@(Background); color: @(Color); width: 100%">
+    <tr>
+        <td width="20">&nbsp;</td>
+        <td>
+            <h2>@Title</h2>
+        </td>
+        <td>&nbsp;</td>
+        <td align="right">
+            @ChildContent
+        </td>
+        <td width="10">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="2"></td>
+    </tr>
+</table>
+
+@functions {
+    [Parameter]
+    string Color { get; set; }
+
+    [Parameter]
+    string Background { get; set; }
+
+    [Parameter]
+    string Title { get; set; }
+
+    [Parameter]
+    private RenderFragment ChildContent { get; set; }
+}

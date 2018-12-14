@@ -16,7 +16,15 @@ namespace LibAcc.Server.Services
 
         public async Task<RentOrder> AddOrUpdate(RentOrder entity)
         {
-            _dbContext.Add(entity);
+            if (entity.RentOrderId == 0)
+            {
+                _dbContext.Add(entity);
+            }
+            else
+            {
+                _dbContext.RentOrders.Update(entity);
+            }
+
             await _dbContext.SaveChangesAsync();
 
             return entity;
