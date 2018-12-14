@@ -1,16 +1,203 @@
 ﻿@page "/RentalAccounting"
+@using System.Globalization
+@using LibAcc.Abstractions.Models
+@using LibAcc.Abstractions.Services
+@using System.Linq
+@inject ICrudService<Book> BookService
+@inject ICrudService<Customer> CustomerService
+@inject ICrudService<RentOrder> RentOrderService
 
-<h1>RentalAccounting</h1>
+<h1>Books Register</h1>
+<hr />
+<form>
+    <ColoredHeader BackGround="#05163D" Color="honeydew" Title="Add new rent">
+        <button type="reset" class="btn btn-info" onclick="@Clear">Clear</button>
+    </ColoredHeader>
+    <hr />
+    <table class="form-group">
+        <tr>
+            <td>
+                <label class="control-label">Id</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingOrder.RentOrderId" readonly />
+            </td>
+            <td width="20">&nbsp;</td>
+            <td>
+                <label class="control-label">Return Date</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingOrder.ReturnDate" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="control-label">Book</label>
+            </td>
+            <td>
+                <select class="control-label" bind="@EditingOrder.BookId">
+                    @foreach (var item in Books)
+                    {
+                        <option value="@item.BookId">(#@item.BookId)@item.Title</option>
+                    }
+                </select>
+            </td>
+            <td width="20">&nbsp;</td>
+            <td>
+                <label class="control-label">Customer</label>
+            </td>
+            <td>
+                <select class="control-label" bind="@EditingOrder.CustomerId">
+                    @foreach (var item in Customers)
+                    {
+                        <option value="@item.CustomerId">(#@item.CustomerId)@item.FirstName @item.LastName</option>
+                    }
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="control-label">Order Date</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingOrder.OrderDate" />
+            </td>
+            <td width="20">&nbsp;</td>
+            <td>
+                <label class="control-label">Order Days</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingOrder.OrderDays" />
+            </td>
+            <td width="20">&nbsp;</td>
+            <td></td>
+            <td>
+                <button type="button" class="btn btn-success" onclick="@(async () => await Add())" style="width:220px;">Save</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<ColoredHeader BackGround="#0A2464" Color="honeydew" Title="Rent list">
+    <Button class="btn btn-info" onclick="@Toggle">Show only late</Button>
+</ColoredHeader>
 
-<p>Current count: @currentCount</p>
 
-<button class="btn btn-primary" onclick="@IncrementCount">Click me</button>
+@if (Orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Book Name</th>
+                <th>Customer</th>
+                <th>Order Date</th>
+                <th>Order Days</th>
+                <th>Return Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Orders)
+            {
+                <tr>
+                    <td>@item.RentOrderId</td>
+                    <td>@BookVm(item.BookId)</td>
+                    <td>@CustomerVm(item.CustomerId)</td>
+                    <td>@item.OrderDate</td>
+                    <td>@item.OrderDays</td>
+                    <td>@ReturnDateVm(item.ReturnDate)</td>
+                    <td><button class="btn btn-primary" onclick="@(async () => await Edit(item.RentOrderId))" style="width:110px;">Edit</button></td>
+                    <td><button class="btn btn-danger" onclick="@(async () => await Delete(item.RentOrderId))">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @functions {
-    int currentCount = 0;
 
-    void IncrementCount()
+    string BookVm(int bookId)
     {
-        currentCount++;
+        return Books.FirstOrDefault(x => x.BookId == bookId)?.Title;
+    }
+
+    string CustomerVm(int bookId)
+    {
+        var customer = Customers.FirstOrDefault(x => x.CustomerId == bookId);
+
+        return (customer?.FirstName ?? "")+ " " + (customer?.LastName ?? "");
+    }
+
+    string ReturnDateVm(DateTime dateTime)
+    {
+        if (dateTime == default)
+        {
+            return "Not returned";
+        }
+
+        return dateTime.ToString();
+    }
+
+    bool ToggleFlag { get; set; }
+
+    Book[] Books { get; set; } = Array.Empty<Book>();
+    Customer[] Customers { get; set; } = Array.Empty<Customer>();
+    RentOrder[] Orders { get; set; }
+
+    RentOrder EditingOrder { get; set; }
+
+    async Task Refresh()
+    {
+        Orders = await RentOrderService.GetAll();
+
+        if (ToggleFlag)
+        {
+            var exp = Orders.Where(x => x.OrderDate.AddDays(x.OrderDays) < DateTime.Now);
+
+            Orders = exp.ToArray();
+        }
+
+        base.StateHasChanged();
+    }
+
+    protected override async Task OnInitAsync()
+    {
+        Clear();
+        Books = await BookService.GetAll();
+        Customers = await CustomerService.GetAll();
+        await Refresh();
+
+    }
+
+    async Task Toggle()
+    {
+        ToggleFlag = !ToggleFlag;
+        await Refresh();
+    }
+
+    void Clear()
+    {
+        EditingOrder = new RentOrder{OrderDate = DateTime.Now, OrderDays = 30};
+    }
+
+    async Task Add()
+    {
+        await RentOrderService.AddOrUpdate(EditingOrder);
+        Clear();
+        await Refresh();
+    }
+
+    async Task Edit(int id)
+    {
+        EditingOrder = await RentOrderService.Get(id);
+    }
+
+    async Task Delete(int id)
+    {
+        await RentOrderService.Delete(id);
+        await Refresh();
     }
 }

@@ -1,68 +1,65 @@
 ﻿@page "/Customers"
 @using LibAcc.Abstractions.Models
 @using LibAcc.Abstractions.Services
-@inject ICrudService<Book> BookService
+@inject ICrudService<Customer> CustomerService
 
-<h1>Books Register</h1>
+<h1>Customers</h1>
 <hr />
+<form>
+    <ColoredHeader BackGround="#05163D" Color="honeydew" Title="Add new Customer">
+        <button type="reset" class="btn btn-info" onclick="@Clear">Clear</button>
+    </ColoredHeader>
+    <hr />
+    <table class="form-group">
+        <tr>
+            <td>
+                <label class="control-label">Id</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingCustomer.CustomerId" readonly />
+            </td>
+            <td width="20">&nbsp;</td>
+            <td>
+                <label class="control-label">Phone Number</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingCustomer.PhoneNumber" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="control-label">First Name</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingCustomer.FirstName" />
+            </td>
+            <td width="20">&nbsp;</td>
+            <td>
+                <label class="control-label">Last Name</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingCustomer.LastName" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="control-label">Additional Info</label>
+            </td>
+            <td>
+                <input type="text" class="form-control" bind="@EditingCustomer.AdditionalInfo" />
+            </td>
+            <td width="20">&nbsp;</td>
+            <td></td>
+            <td>
+                <button type="button" class="btn btn-success" onclick="@(async () => await Add())" style="width:220px;">Save</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<ColoredHeader BackGround="#0A2464" Color="honeydew" Title="Customer list" />
 
 
-<table class="form-group">
-    <tr>
-        <td>
-            <label class="control-label">Id</label>
-        </td>
-        <td>
-            <input type="text" class="form-control" bind="@EditingBook.BookId" readonly />
-        </td>
-        <td width="20">&nbsp;</td>
-        <td>
-            <label class="control-label">Title</label>
-        </td>
-        <td>
-            <input type="text" class="form-control" bind="@EditingBook.Title" />
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <label class="control-label">Author</label>
-        </td>
-        <td>
-            <input type="text" class="form-control" bind="@EditingBook.Author" />
-        </td>
-        <td width="20">&nbsp;</td>
-        <td>
-            <label class="control-label">Description</label>
-        </td>
-        <td>
-            <input type="text" class="form-control" bind="@EditingBook.Description" />
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <label class="control-label">Print Date</label>
-        </td>
-        <td>
-            <input type="text" class="form-control" bind="@EditingBook.PrintDate" />
-        </td>
-        <td width="20">&nbsp;</td>
-        <td>
-            <label class="control-label">Account Date</label>
-        </td>
-        <td>
-            <input type="text" class="form-control" bind="@EditingBook.AccountDate" />
-        </td>
-        <td width="20">&nbsp;</td>
-        <td></td>
-        <td>
-            <button type="submit" class="btn btn-success" onclick="@(async () => await AddBook())" style="width:220px;">Save</button>
-        </td>
-    </tr>
-</table>
-
-
-
-@if (Books == null)
+@if (CustomerList == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -71,26 +68,24 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Book Id</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Description</th>
-                <th>Print Date</th>
-                <th>Account Date</th>
+                <th>Customer Id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Phone Number</th>
+                <th>Additional Info</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Books)
+            @foreach (var item in CustomerList)
             {
                 <tr>
-                    <td>@item.BookId</td>
-                    <td>@item.Title</td>
-                    <td>@item.Author</td>
-                    <td>@item.Description</td>
-                    <td>@item.PrintDate</td>
-                    <td>@item.AccountDate</td>
-                    <td><button class="btn btn-primary" onclick="@(async () => await EditStudent(item.BookId))" style="width:110px;">Edit</button></td>
-                    <td><button class="btn btn-danger" onclick="@(async () => await DeleteStudent(item.BookId))">Delete</button></td>
+                    <td>@item.CustomerId</td>
+                    <td>@item.FirstName</td>
+                    <td>@item.LastName</td>
+                    <td>@item.PhoneNumber</td>
+                    <td>@item.AdditionalInfo</td>
+                    <td><button class="btn btn-primary" onclick="@(async () => await Edit(item.CustomerId))" style="width:110px;">Edit</button></td>
+                    <td><button class="btn btn-danger" onclick="@(async () => await Delete(item.CustomerId))">Delete</button></td>
                 </tr>
             }
         </tbody>
@@ -99,37 +94,36 @@ else
 
 
 @functions {
-Book[] Books { get; set; }
+    Customer[] CustomerList { get; set; }
 
-Book EditingBook { get; set; }
+    Customer EditingCustomer { get; set; }
 
-protected override async Task OnInitAsync()
-{
-    Clear();
-    Books = await BookService.GetAll();
-}
+    protected override async Task OnInitAsync()
+    {
+        Clear();
+        CustomerList = await CustomerService.GetAll();
+    }
 
-void Clear()
-{
-    EditingBook = new Book { AccountDate = DateTime.Now };
+    void Clear()
+    {
+        EditingCustomer = new Customer();
+    }
 
-}
+    async Task Add()
+    {
+        await CustomerService.AddOrUpdate(EditingCustomer);
+        Clear();
+        CustomerList = await CustomerService.GetAll();
+    }
 
-async Task AddBook()
-{
-    await BookService.AddOrUpdate(EditingBook);
-    Clear();
-    Books = await BookService.GetAll();
-}
+    async Task Edit(int id)
+    {
+        EditingCustomer = await CustomerService.Get(id);
+    }
 
-async Task EditStudent(int id)
-{
-    EditingBook = await BookService.Get(id);
-}
-
-async Task DeleteStudent(int id)
-{
-    await BookService.Delete(id);
-    Books = await BookService.GetAll();
-}
+    async Task Delete(int id)
+    {
+        await CustomerService.Delete(id);
+        CustomerList = await CustomerService.GetAll();
+    }
 }
