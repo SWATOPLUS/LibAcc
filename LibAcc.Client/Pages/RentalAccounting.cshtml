@@ -155,7 +155,7 @@ else
 
         if (ToggleFlag)
         {
-            var exp = Orders.Where(x => x.OrderDate.AddDays(x.OrderDays) < DateTime.Now);
+            var exp = Orders.Where(x => x.OrderDate.AddDays(x.OrderDays) < DateTime.Now && x.ReturnDate == default);
 
             Orders = exp.ToArray();
         }

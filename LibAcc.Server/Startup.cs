@@ -10,11 +10,14 @@ using LibAcc.Abstractions.Services;
 using LibAcc.Server.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.InMemory.Query.Internal;
 
 namespace LibAcc.Server
 {
     public class Startup
     {
+        public const bool InMemoryMode = true;
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -38,9 +41,20 @@ namespace LibAcc.Server
                 });
             });
 
-            services.AddScoped<ICrudService<Book>>(context => new BookCrudService(context.GetService<MainDbContext>()));
-            services.AddScoped<ICrudService<Customer>>(context => new CustomerCrudService(context.GetService<MainDbContext>()));
-            services.AddScoped<ICrudService<RentOrder>>(context => new RentOrderCrudService(context.GetService<MainDbContext>()));
+
+            if (InMemoryMode)
+            {
+                services.AddSingleton<ICrudService<Book>>(new BookCrudServiceMock());
+                services.AddSingleton<ICrudService<Customer>>(new CustomerCrudServiceMock());
+                services.AddSingleton<ICrudService<RentOrder>>(new RentOrderCrudServiceMock());
+            }
+            else
+            {
+                services.AddScoped<ICrudService<Book>>(context => new BookCrudService(context.GetService<MainDbContext>()));
+                services.AddScoped<ICrudService<Customer>>(context => new CustomerCrudService(context.GetService<MainDbContext>()));
+                services.AddScoped<ICrudService<RentOrder>>(context => new RentOrderCrudService(context.GetService<MainDbContext>()));
+            }
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
